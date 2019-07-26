@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--configure.status 为设置日志输出级别，级别如下：OFF 、FATAL 、ERROR、WARN、INFO、DEBUG、TRACE 、ALL-->
+<!--configure.monitorInterval 监控间隔指log4j2每隔600秒（10分钟），自动监控该配置文件是否有变化，如果变化，则自动根据文件内容重新配置-->
+<Configuration status="OFF" monitorInterval="60">
+    <properties>
+        <property name="LOG_HOME">logs/log4j2</property>
+        <property name="LOG_BACK_HOME">${LOG_HOME}/backup</property>
+        <property name="ERROR_FILE_NAME">log4j2Error</property>
+        <property name="DEBUG_FILE_NAME">log4j2Debug</property>
+    </properties>
+    <!--先定义所有的appender-->
+    <Appenders>
+        <!--这个输出控制台的配置-->
+        <Console name="Console" target="SYSTEM_OUT"> <!-- 定义类型为Console的Appender -->
+            <!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch）-->
+            <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            <!--这个都知道是输出日志的格式-->
+            <PatternLayout pattern="[%-5level] %d{HH:mm:ss.SSS} [%l]%n   >>>   %msg%n"/> <!-- 定义类型为Pattern的Layout -->
+        </Console>
+        <!--配置日志输出文件名字，追加读写-->
+        <!--Error console log-->
+        <RollingFile name="ErrorLog" fileName="${LOG_HOME}/${ERROR_FILE_NAME}.log"
+                     filePattern="${LOG_BACK_HOME}/$${date:yyyy-MM}/${ERROR_FILE_NAME}.%d{yyyy-MM-dd}.log"
+                     append="true">
+            <!-- 输出格式 -->
+            <PatternLayout
+                    pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [Thread: %thread][%file:%line]%n   >>>   %msg%n"/>
+            <!-- 设置策略 -->
+            <Policies>
+                <!-- 基于时间的触发策略。该策略主要是完成周期性的log文件封存工作。有两个参数：
+                interval，integer型，指定两次封存动作之间的时间间隔。单位:以日志的命名精度来确定单位，
+                    比如yyyy-MM-dd-HH 单位为小时，yyyy-MM-dd-HH-mm 单位为分钟
+                modulate，boolean型，说明是否对封存时间进行调制。若modulate=true，
+                    则封存时间将以0点为边界进行偏移计算。比如，modulate=true，interval=4hours，
+                    那么假设上次封存日志的时间为03:00，则下次封存日志的时间为04:00，
+                    之后的封存时间依次为08:00，12:00，16:00
+                -->
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <Filters>
+                <ThresholdFilter level="error" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+
+        <!-- Debug console log -->
+        <RollingFile name="DebugLog" fileName="${LOG_HOME}/${DEBUG_FILE_NAME}.log"
+                     filePattern="${LOG_BACK_HOME}/$${date:yyyy-MM}/${DEBUG_FILE_NAME}.%d{yyyy-MM-dd}.log"
+                     append="true">
+            <!-- 输出格式 -->
+            <PatternLayout pattern="[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS}%n   >>>   %msg%n"/>
+            <!-- 设置策略 -->
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            </Policies>
+            <Filters>
+                <ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Logger name="UDF" level="debug" additivity="false"> <!-- UDF，其日志级别为debug，additivity为false -->
+<!--        <Logger name="UDF" level="warning" additivity="false"> &lt;!&ndash; UDF，其日志级别为warning，additivity为false &ndash;&gt;-->
+            <AppenderRef ref="Console"/> <!-- Root Logger的Appender引用上面定义的Console -->
+            <AppenderRef ref="DebugLog"/>
+            <AppenderRef ref="ErrorLog"/>
+        </Logger>
+        <Root level="warning"> <!-- 定义Root Logger，其日志级别为error -->
+            <AppenderRef ref="Console"/> <!-- Root Logger的Appender引用上面定义的Console -->
+        </Root>
+    </Loggers>
+</Configuration>
