@@ -1,0 +1,12 @@
+[DEBUG] 2019-07-27 00:23:32.797
+   >>>   udf.HiveUDFMap2Json
+[DEBUG] 2019-07-27 00:23:32.801
+   >>>    > map2json((map) {key=value})
+          > result
+          > {"key":"value"}
+[DEBUG] 2019-07-27 00:23:32.826
+   >>>   udf.HiveUDFMap2Json
+[DEBUG] 2019-07-27 00:23:32.827
+   >>>    > map2json((map) {key=value})
+          > result
+          > {"key":"value"}
