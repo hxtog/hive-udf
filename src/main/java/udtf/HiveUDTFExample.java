@@ -6,7 +6,7 @@ import org.apache.hadoop.hive.ql.udf.generic.GenericUDTF;
 import java.util.ArrayList;
 
 public class HiveUDTFExample extends GenericUDTF {
-    private ArrayList<Object[]> processInputRecord(String name){
+    private ArrayList<Object[]> processInputRecord(String name) {
         ArrayList<Object[]> result = new ArrayList<>();
 
         // ignoring null or empty input
